@@ -1,1 +1,209 @@
-<!DOCTYPE html><html lang="en"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Noom Support Knowledge Base</title>    <style>        body {            font-family: Arial, sans-serif;            margin: 20px;            background-color: #f4f4f4;            color: #333;        }        h1 {            color: #4CAF50;            text-align: center;        }        #searchBar {            width: calc(100% - 20px);            padding: 12px;            margin-bottom: 20px;            border: 1px solid #ddd;            border-radius: 5px;            font-size: 16px;            box-sizing: border-box; /* Include padding in width */        }        .issue-item {            background-color: #fff;            border: 1px solid #e0e0e0;            border-radius: 8px;            margin-bottom: 15px;            padding: 15px;            box-shadow: 0 2px 4px rgba(0,0,0,0.1);            transition: all 0.3s ease;            cursor: pointer;        }        .issue-item:hover {            box-shadow: 0 4px 8px rgba(0,0,0,0.15);            transform: translateY(-2px);        }        .issue-headline {            font-size: 20px;            color: #333;            margin: 0;            padding-right: 20px; /* Space for expand/collapse indicator */            position: relative;        }        .issue-headline::after {            content: '+'; /* Plus sign for collapsed */            position: absolute;            right: 0;            top: 0;            font-size: 24px;            line-height: 1;            transition: transform 0.3s ease;        }        .issue-item.active .issue-headline::after {            content: '-'; /* Minus sign for expanded */            transform: rotate(0deg);        }        .issue-description {            display: none; /* Hidden by default */            margin-top: 10px;            padding-top: 10px;            border-top: 1px dashed #eee;            color: #555;            font-size: 15px;            line-height: 1.6;            white-space: pre-wrap; /* Preserve whitespace and line breaks */        }        .issue-item.active .issue-description {            display: block;        }        /* Style for hidden items when searching */        .issue-item.hidden {            display: none;        }        .no-results {            text-align: center;            color: #888;            margin-top: 20px;            font-size: 18px;            border: 1px solid #ddd;            padding: 10px;            background-color: #f9f9f9;            border-radius: 5px;        }    </style></head><body>    <h1>Noom Support Knowledge Base</h1>    <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">    <p class="no-results" style="display: none;">No issues found matching your search.</p>    <div id="issuesContainer">        <p style="text-align: center; color: #777;">Loading issues...</p>        </div>    <script>        // Your Google Sheet CSV URL has been inserted here!        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv";         let allIssues = [];        function parseCSV(csvString) {            const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');            if (lines.length === 0) return [];            const headers = lines[0].split(',').map(h => h.trim());            const data = [];            for (let i = 1; i
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noom Support Knowledge Base</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #4CAF50;
+            text-align: center;
+        }
+        #searchBar {
+            width: calc(100% - 20px);
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        .issue-item {
+            background-color: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .issue-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+        .issue-headline {
+            font-size: 20px;
+            color: #333;
+            margin: 0;
+            padding-right: 20px; /* Space for expand/collapse indicator */
+            position: relative;
+        }
+        .issue-headline::after {
+            content: '+'; /* Plus sign for collapsed */
+            position: absolute;
+            right: 0;
+            top: 0;
+            font-size: 24px;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        .issue-item.active .issue-headline::after {
+            content: '-'; /* Minus sign for expanded */
+            transform: rotate(0deg);
+        }
+        .issue-description {
+            display: none; /* Hidden by default */
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+        }
+        .issue-item.active .issue-description {
+            display: block;
+        }
+        /* Style for hidden items when searching */
+        .issue-item.hidden {
+            display: none;
+        }
+        .no-results {
+            text-align: center;
+            color: #888;
+            margin-top: 20px;
+            font-size: 18px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Noom Support Knowledge Base</h1>
+
+    <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
+
+    <p class="no-results" style="display: none;">No issues found matching your search.</p>
+
+    <div id="issuesContainer">
+        <p style="text-align: center; color: #777;">Loading issues...</p>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
+
+        let allIssues = [];
+
+        function parseCSV(csvString) {
+            const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
+            if (lines.length === 0) return [];
+
+            const headers = lines[0].split(',').map(h => h.trim());
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = [];
+                let inQuote = false;
+                let start = 0;
+
+                for (let j = 0; j < lines[i].length; j++) {
+                    if (lines[i][j] === '"') {
+                        inQuote = !inQuote;
+                    } else if (lines[i][j] === ',' && !inQuote) {
+                        values.push(lines[i].substring(start, j).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+                        start = j + 1;
+                    }
+                }
+                values.push(lines[i].substring(start).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+
+                if (values.length === headers.length) {
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index];
+                    });
+                    data.push(row);
+                }
+            }
+            return data;
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const parsedData = parseCSV(csvText);
+                allIssues = parsedData; 
+                
+                // *** NEW: Log the parsed data to the console ***
+                console.log("Fetched and parsed issues:", allIssues); 
+
+                displayIssues(allIssues);
+            } catch (error) {
+                console.error("Error fetching or parsing data:", error);
+                const container = document.getElementById('issuesContainer');
+                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
+                document.querySelector('.no-results').style.display = 'none';
+            }
+        }
+
+        function displayIssues(issuesToDisplay) {
+            const container = document.getElementById('issuesContainer');
+            container.innerHTML = '';
+
+            const noResultsMessage = document.querySelector('.no-results');
+            if (issuesToDisplay.length === 0) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+
+            issuesToDisplay.forEach(issue => {
+                const issueItem = document.createElement('div');
+                issueItem.classList.add('issue-item');
+
+                const headline = document.createElement('h2');
+                headline.classList.add('issue-headline');
+                headline.textContent = issue['Headline of the issue'] || 'No Headline'; 
+                issueItem.appendChild(headline);
+
+                const description = document.createElement('p');
+                description.classList.add('issue-description');
+                description.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+                issueItem.appendChild(description);
+
+                issueItem.addEventListener('click', () => {
+                    issueItem.classList.toggle('active');
+                });
+                container.appendChild(issueItem);
+            });
+        }
+
+        const searchBar = document.getElementById('searchBar');
+        searchBar.addEventListener('keyup', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            const filteredIssues = allIssues.filter(issue => {
+                const headline = (issue['Headline of the issue'] || '').toLowerCase();
+                const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
+                
+                return headline.includes(searchTerm) || description.includes(searchTerm);
+            });
+            displayIssues(filteredIssues);
+        });
+
+        document.addEventListener('DOMContentLoaded', fetchData);
+    </script>
+</body>
+</html>
