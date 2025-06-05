@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noom Support Knowledge Base</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Wikimex Agent Scenarios</title> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4CAF50; /* Noom green */
@@ -250,8 +249,7 @@
         </div>
 
         <div class="main-content">
-            <h1>Noom Support Knowledge Base</h1>
-            <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
+            <h1>Wikimex Agent Scenarios</h1> <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
             <p class="no-results" style="display: none;">No issues found matching your search.</p>
             <div id="issuesContainer">
                 <p class="loading-message">Loading issues...</p>
@@ -269,13 +267,12 @@
     <script>
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
 
-        const MAX_HISTORY_ITEMS = 10; // Maximum number of items to store in history
-        const NUM_RECENT_TOPICS = 5; // Number of most recent topics to display
+        const MAX_HISTORY_ITEMS = 10;
+        const NUM_RECENT_TOPICS = 5; 
 
-        let allIssues = []; // Stores all fetched issues
-        let currentHistory = []; // Stores the accessed topics history
+        let allIssues = [];
+        let currentHistory = [];
 
-        // --- CSV Parsing Function ---
         function parseCSV(csvString) {
             const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
@@ -309,9 +306,6 @@
             return data;
         }
 
-        // --- History Management Functions ---
-
-        // Load history from localStorage
         function loadHistory() {
             try {
                 const historyJson = localStorage.getItem('noomKbHistory');
@@ -323,7 +317,6 @@
             displayHistory(currentHistory);
         }
 
-        // Save history to localStorage
         function saveHistory() {
             try {
                 localStorage.setItem('noomKbHistory', JSON.stringify(currentHistory));
@@ -332,29 +325,21 @@
             }
         }
 
-        // Add a topic to history, moving it to the top if it already exists
         function addTopicToHistory(topicHeadline) {
-            // Filter out the current topic if it already exists in history
             currentHistory = currentHistory.filter(item => item.headline !== topicHeadline);
-            
-            // Add the new topic to the beginning
             currentHistory.unshift({ headline: topicHeadline });
             
-            // Trim history to max size
             if (currentHistory.length > MAX_HISTORY_ITEMS) {
                 currentHistory = currentHistory.slice(0, MAX_HISTORY_ITEMS);
             }
             
             saveHistory();
-            displayHistory(currentHistory); // Update the displayed history
+            displayHistory(currentHistory);
         }
 
-        // --- Display Functions ---
-
-        // Display issues in the main content area
         function displayIssues(issuesToDisplay) {
             const container = document.getElementById('issuesContainer');
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = '';
 
             const noResultsMessage = document.querySelector('.no-results');
             if (issuesToDisplay.length === 0) {
@@ -379,7 +364,6 @@
 
                 issueItem.addEventListener('click', () => {
                     issueItem.classList.toggle('active');
-                    // Add to history only when expanded
                     if (issueItem.classList.contains('active')) {
                         addTopicToHistory(issue['Headline of the issue']);
                     }
@@ -388,10 +372,9 @@
             });
         }
 
-        // Display recent topics in the right panel
         function displayRecentTopics(recentTopics) {
             const recentList = document.getElementById('recentTopicsList');
-            recentList.innerHTML = ''; // Clear previous content
+            recentList.innerHTML = '';
 
             if (recentTopics.length === 0) {
                 recentList.innerHTML = '<li class="empty-list-message">No recent topics available.</li>';
@@ -401,22 +384,20 @@
             recentTopics.forEach(topic => {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
-                link.href = "#"; // Prevent page reload
+                link.href = "#";
                 link.textContent = topic.headline;
                 link.addEventListener('click', (e) => {
-                    e.preventDefault(); // Stop default link behavior
-                    // Find the corresponding issue in the main content and scroll to it
+                    e.preventDefault();
                     const issueElements = document.querySelectorAll('.issue-item .issue-headline');
                     issueElements.forEach(headlineEl => {
                         if (headlineEl.textContent === topic.headline) {
                             const parentIssueItem = headlineEl.closest('.issue-item');
                             if (parentIssueItem) {
                                 parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active'); // Open the topic
-                                addTopicToHistory(topic.headline); // Add to history
+                                parentIssueItem.classList.add('active');
+                                addTopicToHistory(topic.headline);
                             }
                         } else {
-                            // Optionally, close other open topics
                             headlineEl.closest('.issue-item')?.classList.remove('active');
                         }
                     });
@@ -426,10 +407,9 @@
             });
         }
 
-        // Display history in the left panel
         function displayHistory(history) {
             const historyList = document.getElementById('historyList');
-            historyList.innerHTML = ''; // Clear previous content
+            historyList.innerHTML = '';
 
             if (history.length === 0) {
                 historyList.innerHTML = '<li class="empty-list-message">No topics accessed yet.</li>';
@@ -439,36 +419,29 @@
             history.forEach(item => {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
-                link.href = "#"; // Prevent page reload
+                link.href = "#";
                 link.textContent = item.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Find the corresponding issue in the main content and scroll to it
                     const issueElements = document.querySelectorAll('.issue-item .issue-headline');
                     issueElements.forEach(headlineEl => {
                         if (headlineEl.textContent === item.headline) {
                             const parentIssueItem = headlineEl.closest('.issue-item');
                             if (parentIssueItem) {
                                 parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active'); // Open the topic
-                                // No need to re-add to history, as it's already in history and we just moved it to top
-                                // but we might re-trigger the addTopicToHistory if it's considered an "access"
-                                // For now, we'll keep it simple and assume history management handles it.
+                                parentIssueItem.classList.add('active');
                             }
                         } else {
-                            // Optionally, close other open topics
                             headlineEl.closest('.issue-item')?.classList.remove('active');
                         }
                     });
-                     // Re-add to history to bring it to the top (most recently accessed)
-                    addTopicToHistory(item.headline);
+                    addTopicToHistory(item.headline); // Re-add to history to bring it to the top
                 });
                 listItem.appendChild(link);
                 historyList.appendChild(listItem);
             });
         }
 
-        // --- Main Data Fetching and Initialization ---
         async function fetchData() {
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL);
@@ -481,10 +454,8 @@
                 
                 console.log("Fetched and parsed issues:", allIssues); 
 
-                // Display all issues in the main content
                 displayIssues(allIssues);
 
-                // Display recent topics (e.g., the first NUM_RECENT_TOPICS from the sheet)
                 const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
                     headline: issue['Headline of the issue']
                 }));
@@ -494,11 +465,10 @@
                 console.error("Error fetching or parsing data:", error);
                 const container = document.getElementById('issuesContainer');
                 container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
-                document.querySelector('.no-results').style.display = 'none'; // Hide if general error
+                document.querySelector('.no-results').style.display = 'none';
             }
         }
 
-        // --- Event Listeners and Initial Load ---
         const searchBar = document.getElementById('searchBar');
         searchBar.addEventListener('keyup', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
@@ -513,8 +483,8 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
-            fetchData(); // Fetch data first
-            loadHistory(); // Load history after data might have been fetched
+            fetchData();
+            loadHistory();
         });
     </script>
 </body>
