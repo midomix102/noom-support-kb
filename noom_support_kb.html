@@ -4,105 +4,278 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noom Support Knowledge Base</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #4CAF50; /* Noom green */
+            --secondary-color: #f0f0f0; /* Light background */
+            --text-color: #333;
+            --light-text-color: #666;
+            --border-color: #e0e0e0;
+            --panel-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --border-radius: 10px;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
         }
+
+        .container {
+            display: flex;
+            gap: 20px; /* Space between columns */
+            width: 100%;
+            max-width: 1400px; /* Max width for the entire layout */
+            margin: auto; /* Center the container */
+        }
+
+        .left-panel, .right-panel {
+            background-color: var(--panel-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            overflow-y: auto; /* Enable scrolling for panels */
+            min-width: 250px;
+            max-width: 300px;
+            flex-shrink: 0; /* Don't allow panels to shrink */
+        }
+
+        .main-content {
+            flex-grow: 1; /* Allows main content to take remaining space */
+            background-color: var(--panel-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
         h1 {
-            color: #4CAF50;
+            color: var(--primary-color);
             text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-size: 2.5em;
+            font-weight: 600;
         }
+        h2 {
+            color: var(--text-color);
+            font-size: 1.4em;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
         #searchBar {
-            width: calc(100% - 20px);
+            width: calc(100% - 24px); /* Account for padding */
             padding: 12px;
             margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            box-sizing: border-box; /* Include padding in width */
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            box-sizing: border-box;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
+        #searchBar:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+
         .issue-item {
-            background-color: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
+            background-color: #f9f9f9;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
             margin-bottom: 15px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             cursor: pointer;
+            overflow: hidden; /* To contain floated elements if any */
         }
         .issue-item:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+            background-color: #f5f5f5;
         }
+        .issue-item.active {
+            background-color: #e8f5e9; /* Lighter green background when active */
+            border-color: var(--primary-color);
+        }
+
         .issue-headline {
-            font-size: 20px;
-            color: #333;
+            font-size: 1.25em;
+            color: var(--text-color);
             margin: 0;
-            padding-right: 20px; /* Space for expand/collapse indicator */
+            padding-right: 30px; /* Space for expand/collapse indicator */
             position: relative;
+            font-weight: 600;
         }
         .issue-headline::after {
-            content: '+'; /* Plus sign for collapsed */
+            content: '+';
             position: absolute;
             right: 0;
-            top: 0;
-            font-size: 24px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.8em;
             line-height: 1;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, content 0.3s ease;
+            color: var(--primary-color);
+            font-weight: 400;
         }
         .issue-item.active .issue-headline::after {
-            content: '-'; /* Minus sign for expanded */
-            transform: rotate(0deg);
+            content: '-';
+            transform: translateY(-50%) rotate(0deg); /* No rotation needed, just changes to '-' */
         }
+
         .issue-description {
-            display: none; /* Hidden by default */
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed #eee;
-            color: #555;
-            font-size: 15px;
-            line-height: 1.6;
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed var(--border-color);
+            color: var(--light-text-color);
+            font-size: 0.95em;
+            line-height: 1.7;
             white-space: pre-wrap; /* Preserve whitespace and line breaks */
         }
         .issue-item.active .issue-description {
             display: block;
         }
-        /* Style for hidden items when searching */
-        .issue-item.hidden {
-            display: none;
-        }
+
         .no-results {
             text-align: center;
             color: #888;
             margin-top: 20px;
-            font-size: 18px;
+            font-size: 1.1em;
             border: 1px solid #ddd;
-            padding: 10px;
-            background-color: #f9f9f9;
+            padding: 15px;
+            background-color: #fff8e1; /* Light yellow for info */
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: none; /* Hidden by default */
+        }
+
+        .panel-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .panel-list li {
+            margin-bottom: 10px;
+        }
+        .panel-list li a {
+            display: block;
+            padding: 8px 12px;
+            background-color: #f0fdf0; /* Lighter green for list items */
             border-radius: 5px;
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            font-size: 0.9em;
+            font-weight: 400;
+            white-space: nowrap; /* Prevent wrapping */
+            overflow: hidden; /* Hide overflow content */
+            text-overflow: ellipsis; /* Add ellipsis for overflow */
+        }
+        .panel-list li a:hover {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .panel-list li a:active {
+            transform: translateY(1px);
+        }
+
+        /* Initial loading message style */
+        .loading-message {
+            text-align: center;
+            color: #777;
+            margin-top: 50px;
+            font-size: 1.1em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column; /* Stack columns on smaller screens */
+                padding: 15px;
+            }
+            .left-panel, .right-panel, .main-content {
+                max-width: 100%;
+                min-width: unset;
+                width: 100%;
+                padding: 15px;
+            }
+            .left-panel, .right-panel {
+                order: -1; /* Place panels above main content on small screens */
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            .issue-headline {
+                font-size: 1.15em;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Noom Support Knowledge Base</h1>
+    <div class="container">
+        <div class="left-panel">
+            <h3>Accessed Topics (History)</h3>
+            <ul id="historyList" class="panel-list">
+                <li class="empty-list-message">No topics accessed yet.</li>
+            </ul>
+        </div>
 
-    <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
+        <div class="main-content">
+            <h1>Noom Support Knowledge Base</h1>
+            <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
+            <p class="no-results" style="display: none;">No issues found matching your search.</p>
+            <div id="issuesContainer">
+                <p class="loading-message">Loading issues...</p>
+            </div>
+        </div>
 
-    <p class="no-results" style="display: none;">No issues found matching your search.</p>
-
-    <div id="issuesContainer">
-        <p style="text-align: center; color: #777;">Loading issues...</p>
+        <div class="right-panel">
+            <h3>Most Recent Topics</h3>
+            <ul id="recentTopicsList" class="panel-list">
+                <li class="empty-list-message">No recent topics available.</li>
+            </ul>
+        </div>
     </div>
 
     <script>
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
 
-        let allIssues = [];
+        const MAX_HISTORY_ITEMS = 10; // Maximum number of items to store in history
+        const NUM_RECENT_TOPICS = 5; // Number of most recent topics to display
 
+        let allIssues = []; // Stores all fetched issues
+        let currentHistory = []; // Stores the accessed topics history
+
+        // --- CSV Parsing Function ---
         function parseCSV(csvString) {
             const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
@@ -136,31 +309,52 @@
             return data;
         }
 
-        async function fetchData() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const csvText = await response.text();
-                const parsedData = parseCSV(csvText);
-                allIssues = parsedData; 
-                
-                // *** NEW: Log the parsed data to the console ***
-                console.log("Fetched and parsed issues:", allIssues); 
+        // --- History Management Functions ---
 
-                displayIssues(allIssues);
-            } catch (error) {
-                console.error("Error fetching or parsing data:", error);
-                const container = document.getElementById('issuesContainer');
-                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
-                document.querySelector('.no-results').style.display = 'none';
+        // Load history from localStorage
+        function loadHistory() {
+            try {
+                const historyJson = localStorage.getItem('noomKbHistory');
+                currentHistory = historyJson ? JSON.parse(historyJson) : [];
+            } catch (e) {
+                console.error("Error loading history from localStorage:", e);
+                currentHistory = [];
+            }
+            displayHistory(currentHistory);
+        }
+
+        // Save history to localStorage
+        function saveHistory() {
+            try {
+                localStorage.setItem('noomKbHistory', JSON.stringify(currentHistory));
+            } catch (e) {
+                console.error("Error saving history to localStorage:", e);
             }
         }
 
+        // Add a topic to history, moving it to the top if it already exists
+        function addTopicToHistory(topicHeadline) {
+            // Filter out the current topic if it already exists in history
+            currentHistory = currentHistory.filter(item => item.headline !== topicHeadline);
+            
+            // Add the new topic to the beginning
+            currentHistory.unshift({ headline: topicHeadline });
+            
+            // Trim history to max size
+            if (currentHistory.length > MAX_HISTORY_ITEMS) {
+                currentHistory = currentHistory.slice(0, MAX_HISTORY_ITEMS);
+            }
+            
+            saveHistory();
+            displayHistory(currentHistory); // Update the displayed history
+        }
+
+        // --- Display Functions ---
+
+        // Display issues in the main content area
         function displayIssues(issuesToDisplay) {
             const container = document.getElementById('issuesContainer');
-            container.innerHTML = '';
+            container.innerHTML = ''; // Clear previous content
 
             const noResultsMessage = document.querySelector('.no-results');
             if (issuesToDisplay.length === 0) {
@@ -185,11 +379,126 @@
 
                 issueItem.addEventListener('click', () => {
                     issueItem.classList.toggle('active');
+                    // Add to history only when expanded
+                    if (issueItem.classList.contains('active')) {
+                        addTopicToHistory(issue['Headline of the issue']);
+                    }
                 });
                 container.appendChild(issueItem);
             });
         }
 
+        // Display recent topics in the right panel
+        function displayRecentTopics(recentTopics) {
+            const recentList = document.getElementById('recentTopicsList');
+            recentList.innerHTML = ''; // Clear previous content
+
+            if (recentTopics.length === 0) {
+                recentList.innerHTML = '<li class="empty-list-message">No recent topics available.</li>';
+                return;
+            }
+
+            recentTopics.forEach(topic => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = "#"; // Prevent page reload
+                link.textContent = topic.headline;
+                link.addEventListener('click', (e) => {
+                    e.preventDefault(); // Stop default link behavior
+                    // Find the corresponding issue in the main content and scroll to it
+                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
+                    issueElements.forEach(headlineEl => {
+                        if (headlineEl.textContent === topic.headline) {
+                            const parentIssueItem = headlineEl.closest('.issue-item');
+                            if (parentIssueItem) {
+                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                parentIssueItem.classList.add('active'); // Open the topic
+                                addTopicToHistory(topic.headline); // Add to history
+                            }
+                        } else {
+                            // Optionally, close other open topics
+                            headlineEl.closest('.issue-item')?.classList.remove('active');
+                        }
+                    });
+                });
+                listItem.appendChild(link);
+                recentList.appendChild(listItem);
+            });
+        }
+
+        // Display history in the left panel
+        function displayHistory(history) {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = ''; // Clear previous content
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<li class="empty-list-message">No topics accessed yet.</li>';
+                return;
+            }
+
+            history.forEach(item => {
+                const listItem = document.createElement('li');
+                const link = document.createElement('a');
+                link.href = "#"; // Prevent page reload
+                link.textContent = item.headline;
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Find the corresponding issue in the main content and scroll to it
+                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
+                    issueElements.forEach(headlineEl => {
+                        if (headlineEl.textContent === item.headline) {
+                            const parentIssueItem = headlineEl.closest('.issue-item');
+                            if (parentIssueItem) {
+                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                parentIssueItem.classList.add('active'); // Open the topic
+                                // No need to re-add to history, as it's already in history and we just moved it to top
+                                // but we might re-trigger the addTopicToHistory if it's considered an "access"
+                                // For now, we'll keep it simple and assume history management handles it.
+                            }
+                        } else {
+                            // Optionally, close other open topics
+                            headlineEl.closest('.issue-item')?.classList.remove('active');
+                        }
+                    });
+                     // Re-add to history to bring it to the top (most recently accessed)
+                    addTopicToHistory(item.headline);
+                });
+                listItem.appendChild(link);
+                historyList.appendChild(listItem);
+            });
+        }
+
+        // --- Main Data Fetching and Initialization ---
+        async function fetchData() {
+            try {
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const parsedData = parseCSV(csvText);
+                allIssues = parsedData; 
+                
+                console.log("Fetched and parsed issues:", allIssues); 
+
+                // Display all issues in the main content
+                displayIssues(allIssues);
+
+                // Display recent topics (e.g., the first NUM_RECENT_TOPICS from the sheet)
+                const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
+                    headline: issue['Headline of the issue']
+                }));
+                displayRecentTopics(recentTopics);
+
+            } catch (error) {
+                console.error("Error fetching or parsing data:", error);
+                const container = document.getElementById('issuesContainer');
+                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
+                document.querySelector('.no-results').style.display = 'none'; // Hide if general error
+            }
+        }
+
+        // --- Event Listeners and Initial Load ---
         const searchBar = document.getElementById('searchBar');
         searchBar.addEventListener('keyup', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
@@ -203,7 +512,10 @@
             displayIssues(filteredIssues);
         });
 
-        document.addEventListener('DOMContentLoaded', fetchData);
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchData(); // Fetch data first
+            loadHistory(); // Load history after data might have been fetched
+        });
     </script>
 </body>
 </html>
