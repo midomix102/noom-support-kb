@@ -108,28 +108,24 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             cursor: pointer;
-            overflow: hidden; /* To contain floated elements if any */
+            overflow: hidden;
         }
         .issue-item:hover {
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transform: translateY(-3px);
             background-color: #f5f5f5;
         }
-        /* No active class for in-place expansion anymore */
 
         .issue-headline {
             font-size: 1.25em;
             color: var(--text-color);
             margin: 0;
-            padding-right: 0; /* No expand/collapse indicator for main list */
+            padding-right: 0;
             position: relative;
             font-weight: 600;
         }
-        /* No ::after for in-place expansion */
 
         .issue-description {
-            /* This style block is no longer relevant for the main list,
-               as descriptions are now only in the modal */
             display: none;
         }
 
@@ -140,10 +136,10 @@
             font-size: 1.1em;
             border: 1px solid #ddd;
             padding: 15px;
-            background-color: #fff8e1; /* Light yellow for info */
+            background-color: #fff8e1;
             border-radius: var(--border-radius);
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: none; /* Hidden by default */
+            display: none;
         }
 
         .panel-list {
@@ -157,16 +153,16 @@
         .panel-list li a {
             display: block;
             padding: 8px 12px;
-            background-color: #f0fdf0; /* Lighter green for list items */
+            background-color: #f0fdf0;
             border-radius: 5px;
             color: var(--primary-color);
             text-decoration: none;
             transition: background-color 0.2s ease, color 0.2s ease;
             font-size: 0.9em;
             font-weight: 400;
-            white-space: nowrap; /* Prevent wrapping */
-            overflow: hidden; /* Hide overflow content */
-            text-overflow: ellipsis; /* Add ellipsis for overflow */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .panel-list li a:hover {
             background-color: var(--primary-color);
@@ -177,7 +173,6 @@
             transform: translateY(1px);
         }
 
-        /* Initial loading message style */
         .loading-message {
             text-align: center;
             color: #777;
@@ -187,18 +182,18 @@
 
         /* --- Modal Styles --- */
         .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
+            display: none;
+            position: fixed;
+            z-index: 1000;
             left: 0;
             top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
-            display: flex; /* Use flex for centering */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             animation: fadeIn 0.3s ease-out;
         }
 
@@ -209,10 +204,10 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             position: relative;
-            max-width: 800px; /* Max width of the modal */
-            width: 90%; /* Responsive width */
-            max-height: 90vh; /* Max height for scrolling */
-            overflow-y: auto; /* Enable scrolling for content if needed */
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
             animation: slideIn 0.3s ease-out;
         }
 
@@ -221,7 +216,7 @@
             color: var(--primary-color);
             margin-top: 0;
             margin-bottom: 15px;
-            padding-right: 40px; /* Space for close button */
+            padding-right: 40px;
         }
 
         .modal-content p {
@@ -229,11 +224,10 @@
             font-size: 1em;
             line-height: 1.7;
             margin-bottom: 15px;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
         }
 
         .modal-content .related-link {
-            display: inline-block; /* Make it block to separate from text */
+            display: inline-block;
             margin-top: 15px;
             font-weight: 600;
             color: var(--primary-color);
@@ -248,10 +242,18 @@
             color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        .modal-description-text img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
 
         .close-button {
             color: #aaa;
-            font-size: 2.5em; /* Larger X */
+            font-size: 2.5em;
             font-weight: bold;
             position: absolute;
             right: 15px;
@@ -266,7 +268,6 @@
             outline: none;
         }
 
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -277,11 +278,9 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-
-        /* Responsive adjustments */
         @media (max-width: 1024px) {
             .container {
-                flex-direction: column; /* Stack columns on smaller screens */
+                flex-direction: column;
                 padding: 15px;
             }
             .left-panel, .right-panel, .main-content {
@@ -291,7 +290,7 @@
                 padding: 15px;
             }
             .left-panel, .right-panel {
-                order: -1; /* Place panels above main content on small screens */
+                order: -1;
             }
             .modal-content {
                 width: 95%;
@@ -348,11 +347,13 @@
             <h2 id="modalHeadline"></h2>
             <div id="modalDescription" class="modal-description-text"></div>
             <a id="modalLink" class="related-link" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
+            <img id="modalImage" style="display: none; max-width: 100%; height: auto; margin-top: 20px;" alt="Related image">
         </div>
     </div>
 
     <script>
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
+        // Your Google Apps Script Web App URL has been inserted here!
+        const GOOGLE_APP_SCRIPT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwzGYxNJXnEIpCrrJRwV4EN_1IFrPKq2fI6ZtpfgI128MYU2sWhFzsBGUEb/exec'; 
 
         const MAX_HISTORY_ITEMS = 10;
         const NUM_RECENT_TOPICS = 5; 
@@ -360,45 +361,11 @@
         let allIssues = [];
         let currentHistory = [];
 
-        // --- CSV Parsing Function ---
-        function parseCSV(csvString) {
-            const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
-            if (lines.length === 0) return [];
-
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = [];
-                let inQuote = false;
-                let start = 0;
-
-                for (let j = 0; j < lines[i].length; j++) {
-                    if (lines[i][j] === '"') {
-                        inQuote = !inQuote;
-                    } else if (lines[i][j] === ',' && !inQuote) {
-                        values.push(lines[i].substring(start, j).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-                        start = j + 1;
-                    }
-                }
-                values.push(lines[i].substring(start).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-
-                if (values.length === headers.length) {
-                    const row = {};
-                    headers.forEach((header, index) => {
-                        row[header] = values[index];
-                    });
-                    data.push(row);
-                }
-            }
-            return data;
-        }
-
-        // --- History Management Functions ---
+        // No more parseCSV function needed as we are getting JSON directly from Apps Script
 
         function loadHistory() {
             try {
-                const historyJson = localStorage.getItem('wikimexKbHistory'); // Changed key for clarity
+                const historyJson = localStorage.getItem('wikimexKbHistory');
                 currentHistory = historyJson ? JSON.parse(historyJson) : [];
             } catch (e) {
                 console.error("Error loading history from localStorage:", e);
@@ -409,7 +376,7 @@
 
         function saveHistory() {
             try {
-                localStorage.setItem('wikimexKbHistory', JSON.stringify(currentHistory)); // Changed key
+                localStorage.setItem('wikimexKbHistory', JSON.stringify(currentHistory));
             } catch (e) {
                 console.error("Error saving history to localStorage:", e);
             }
@@ -427,40 +394,49 @@
             displayHistory(currentHistory);
         }
 
-        // --- Modal Control Functions ---
         function openTopicModal(issue) {
             const modal = document.getElementById('topicModal');
             const modalHeadline = document.getElementById('modalHeadline');
             const modalDescriptionDiv = document.getElementById('modalDescription');
             const modalLink = document.getElementById('modalLink');
+            const modalImage = document.getElementById('modalImage');
 
             modalHeadline.textContent = issue['Headline of the issue'] || 'No Headline';
-            modalDescriptionDiv.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+            
+            // Apps Script provides HTML content directly, so set innerHTML
+            modalDescriptionDiv.innerHTML = issue['description of the issue and how it solved perfectly'] || 'No description.';
 
             const relatedLinkURL = issue['Related Link URL'];
             const relatedLinkText = issue['Related Link Text'];
-
             if (relatedLinkURL && relatedLinkURL.trim() !== '') {
                 modalLink.href = relatedLinkURL.trim();
                 modalLink.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
-                modalLink.style.display = 'block'; // Show the link
+                modalLink.style.display = 'block';
             } else {
-                modalLink.style.display = 'none'; // Hide if no link
+                modalLink.style.display = 'none';
             }
 
-            modal.style.display = 'flex'; // Use flex to show and center
-            addTopicToHistory(issue['Headline of the issue']); // Add to history when opened
+            const imageURL = issue['Image URL'];
+            if (imageURL && imageURL.trim() !== '') {
+                modalImage.src = imageURL.trim();
+                modalImage.alt = issue['Headline of the issue'] + ' image' || 'Related image';
+                modalImage.style.display = 'block';
+            } else {
+                modalImage.style.display = 'none';
+                modalImage.src = '';
+            }
+
+            modal.style.display = 'flex';
+            addTopicToHistory(issue['Headline of the issue']);
         }
 
         function closeTopicModal() {
             document.getElementById('topicModal').style.display = 'none';
         }
 
-        // --- Display Functions ---
-
         function displayIssues(issuesToDisplay) {
             const container = document.getElementById('issuesContainer');
-            container.innerHTML = ''; // Clear previous content
+            container.innerHTML = '';
 
             const noResultsMessage = document.querySelector('.no-results');
             if (issuesToDisplay.length === 0) {
@@ -478,9 +454,8 @@
                 headline.textContent = issue['Headline of the issue'] || 'No Headline'; 
                 issueItem.appendChild(headline);
 
-                // For the main list, clicking opens the modal, not expanding in-place
                 issueItem.addEventListener('click', () => {
-                    openTopicModal(issue); // Open the modal with this issue's data
+                    openTopicModal(issue);
                 });
                 container.appendChild(issueItem);
             });
@@ -502,10 +477,9 @@
                 link.textContent = topic.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Find the full issue object from allIssues array based on headline
                     const fullIssue = allIssues.find(item => item['Headline of the issue'] === topic.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue); // Open modal using the full issue data
+                        openTopicModal(fullIssue);
                     }
                 });
                 listItem.appendChild(link);
@@ -529,10 +503,9 @@
                 link.textContent = item.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    // Find the full issue object from allIssues array based on headline
                     const fullIssue = allIssues.find(issue => issue['Headline of the issue'] === item.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue); // Open modal using the full issue data
+                        openTopicModal(fullIssue);
                     }
                 });
                 listItem.appendChild(link);
@@ -540,18 +513,16 @@
             });
         }
 
-        // --- Main Data Fetching and Initialization ---
         async function fetchData() {
             try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                const response = await fetch(GOOGLE_APP_SCRIPT_WEB_APP_URL); 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const csvText = await response.text();
-                const parsedData = parseCSV(csvText);
-                allIssues = parsedData; 
+                const jsonData = await response.json(); 
+                allIssues = jsonData; 
                 
-                console.log("Fetched and parsed issues:", allIssues); 
+                console.log("Fetched and parsed issues (from Apps Script):", allIssues); 
 
                 displayIssues(allIssues);
 
@@ -563,12 +534,11 @@
             } catch (error) {
                 console.error("Error fetching or parsing data:", error);
                 const container = document.getElementById('issuesContainer');
-                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
+                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check your Google Apps Script Web App URL and ensure it's deployed correctly with 'Anyone' access. <br>Error: ${error.message}</p>`;
                 document.querySelector('.no-results').style.display = 'none';
             }
         }
 
-        // --- Event Listeners and Initial Load ---
         const searchBar = document.getElementById('searchBar');
         searchBar.addEventListener('keyup', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
@@ -576,9 +546,10 @@
             const filteredIssues = allIssues.filter(issue => {
                 const headline = (issue['Headline of the issue'] || '').toLowerCase();
                 const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
-                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase(); // Include search for link text
+                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase();
+                const imageURL = (issue['Image URL'] || '').toLowerCase(); 
                 
-                return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm);
+                return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm) || imageURL.includes(searchTerm);
             });
             displayIssues(filteredIssues);
         });
@@ -588,11 +559,9 @@
             loadHistory();
         });
 
-        // --- Modal Event Listeners ---
         const closeButton = document.querySelector('.close-button');
         closeButton.addEventListener('click', closeTopicModal);
 
-        // Close modal if user clicks outside the modal content
         window.addEventListener('click', (event) => {
             const modal = document.getElementById('topicModal');
             if (event.target === modal) {
@@ -600,7 +569,6 @@
             }
         });
 
-        // Close modal if user presses the Escape key
         window.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
                 closeTopicModal();
