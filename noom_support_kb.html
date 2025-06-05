@@ -115,60 +115,23 @@
             transform: translateY(-3px);
             background-color: #f5f5f5;
         }
-        .issue-item.active {
-            background-color: #e8f5e9; /* Lighter green background when active */
-            border-color: var(--primary-color);
-        }
+        /* No active class for in-place expansion anymore */
 
         .issue-headline {
             font-size: 1.25em;
             color: var(--text-color);
             margin: 0;
-            padding-right: 30px; /* Space for expand/collapse indicator */
+            padding-right: 0; /* No expand/collapse indicator for main list */
             position: relative;
             font-weight: 600;
         }
-        .issue-headline::after {
-            content: '+';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.8em;
-            line-height: 1;
-            transition: transform 0.3s ease, content 0.3s ease;
-            color: var(--primary-color);
-            font-weight: 400;
-        }
-        .issue-item.active .issue-headline::after {
-            content: '-';
-            transform: translateY(-50%) rotate(0deg); /* No rotation needed, just changes to '-' */
-        }
+        /* No ::after for in-place expansion */
 
         .issue-description {
+            /* This style block is no longer relevant for the main list,
+               as descriptions are now only in the modal */
             display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
-            color: var(--light-text-color);
-            font-size: 0.95em;
-            line-height: 1.7;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
         }
-        .issue-item.active .issue-description {
-            display: block;
-        }
-        .issue-description .related-link {
-            display: block; /* Make the link appear on its own line */
-            margin-top: 10px;
-            font-weight: 600;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        .issue-description .related-link:hover {
-            text-decoration: underline;
-        }
-
 
         .no-results {
             text-align: center;
@@ -222,6 +185,99 @@
             font-size: 1.1em;
         }
 
+        /* --- Modal Styles --- */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.6); /* Black w/ opacity */
+            display: flex; /* Use flex for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-content {
+            background-color: var(--panel-bg);
+            margin: auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            position: relative;
+            max-width: 800px; /* Max width of the modal */
+            width: 90%; /* Responsive width */
+            max-height: 90vh; /* Max height for scrolling */
+            overflow-y: auto; /* Enable scrolling for content if needed */
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .modal-content h2 {
+            font-size: 2em;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-right: 40px; /* Space for close button */
+        }
+
+        .modal-content p {
+            color: var(--light-text-color);
+            font-size: 1em;
+            line-height: 1.7;
+            margin-bottom: 15px;
+            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+        }
+
+        .modal-content .related-link {
+            display: inline-block; /* Make it block to separate from text */
+            margin-top: 15px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+            border: 1px solid var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+        }
+        .modal-content .related-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .close-button {
+            color: #aaa;
+            font-size: 2.5em; /* Larger X */
+            font-weight: bold;
+            position: absolute;
+            right: 15px;
+            top: 10px;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: var(--text-color);
+            text-decoration: none;
+            outline: none;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+
         /* Responsive adjustments */
         @media (max-width: 1024px) {
             .container {
@@ -237,6 +293,10 @@
             .left-panel, .right-panel {
                 order: -1; /* Place panels above main content on small screens */
             }
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
         }
         @media (max-width: 768px) {
             body {
@@ -247,6 +307,11 @@
             }
             .issue-headline {
                 font-size: 1.15em;
+            }
+            .close-button {
+                font-size: 2em;
+                right: 10px;
+                top: 5px;
             }
         }
     </style>
@@ -277,6 +342,15 @@
         </div>
     </div>
 
+    <div id="topicModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="modalHeadline"></h2>
+            <div id="modalDescription" class="modal-description-text"></div>
+            <a id="modalLink" class="related-link" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
+        </div>
+    </div>
+
     <script>
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
 
@@ -286,6 +360,7 @@
         let allIssues = [];
         let currentHistory = [];
 
+        // --- CSV Parsing Function ---
         function parseCSV(csvString) {
             const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
             if (lines.length === 0) return [];
@@ -319,9 +394,11 @@
             return data;
         }
 
+        // --- History Management Functions ---
+
         function loadHistory() {
             try {
-                const historyJson = localStorage.getItem('noomKbHistory');
+                const historyJson = localStorage.getItem('wikimexKbHistory'); // Changed key for clarity
                 currentHistory = historyJson ? JSON.parse(historyJson) : [];
             } catch (e) {
                 console.error("Error loading history from localStorage:", e);
@@ -332,7 +409,7 @@
 
         function saveHistory() {
             try {
-                localStorage.setItem('noomKbHistory', JSON.stringify(currentHistory));
+                localStorage.setItem('wikimexKbHistory', JSON.stringify(currentHistory)); // Changed key
             } catch (e) {
                 console.error("Error saving history to localStorage:", e);
             }
@@ -350,9 +427,40 @@
             displayHistory(currentHistory);
         }
 
+        // --- Modal Control Functions ---
+        function openTopicModal(issue) {
+            const modal = document.getElementById('topicModal');
+            const modalHeadline = document.getElementById('modalHeadline');
+            const modalDescriptionDiv = document.getElementById('modalDescription');
+            const modalLink = document.getElementById('modalLink');
+
+            modalHeadline.textContent = issue['Headline of the issue'] || 'No Headline';
+            modalDescriptionDiv.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+
+            const relatedLinkURL = issue['Related Link URL'];
+            const relatedLinkText = issue['Related Link Text'];
+
+            if (relatedLinkURL && relatedLinkURL.trim() !== '') {
+                modalLink.href = relatedLinkURL.trim();
+                modalLink.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
+                modalLink.style.display = 'block'; // Show the link
+            } else {
+                modalLink.style.display = 'none'; // Hide if no link
+            }
+
+            modal.style.display = 'flex'; // Use flex to show and center
+            addTopicToHistory(issue['Headline of the issue']); // Add to history when opened
+        }
+
+        function closeTopicModal() {
+            document.getElementById('topicModal').style.display = 'none';
+        }
+
+        // --- Display Functions ---
+
         function displayIssues(issuesToDisplay) {
             const container = document.getElementById('issuesContainer');
-            container.innerHTML = '';
+            container.innerHTML = ''; // Clear previous content
 
             const noResultsMessage = document.querySelector('.no-results');
             if (issuesToDisplay.length === 0) {
@@ -370,34 +478,9 @@
                 headline.textContent = issue['Headline of the issue'] || 'No Headline'; 
                 issueItem.appendChild(headline);
 
-                const description = document.createElement('p');
-                description.classList.add('issue-description');
-                
-                // Add the main description text
-                description.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-
-                // *** NEW: Check for related link URL and text ***
-                const relatedLinkURL = issue['Related Link URL'];
-                const relatedLinkText = issue['Related Link Text'];
-
-                if (relatedLinkURL && relatedLinkURL.trim() !== '') {
-                    const linkElement = document.createElement('a');
-                    linkElement.href = relatedLinkURL.trim();
-                    linkElement.target = "_blank"; // Open in new tab
-                    linkElement.rel = "noopener noreferrer"; // Security best practice
-                    linkElement.classList.add('related-link');
-                    linkElement.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
-                    description.appendChild(linkElement);
-                }
-                // *** END NEW ***
-
-                issueItem.appendChild(description);
-
+                // For the main list, clicking opens the modal, not expanding in-place
                 issueItem.addEventListener('click', () => {
-                    issueItem.classList.toggle('active');
-                    if (issueItem.classList.contains('active')) {
-                        addTopicToHistory(issue['Headline of the issue']);
-                    }
+                    openTopicModal(issue); // Open the modal with this issue's data
                 });
                 container.appendChild(issueItem);
             });
@@ -419,19 +502,11 @@
                 link.textContent = topic.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
-                    issueElements.forEach(headlineEl => {
-                        if (headlineEl.textContent === topic.headline) {
-                            const parentIssueItem = headlineEl.closest('.issue-item');
-                            if (parentIssueItem) {
-                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active');
-                                addTopicToHistory(topic.headline);
-                            }
-                        } else {
-                            headlineEl.closest('.issue-item')?.classList.remove('active');
-                        }
-                    });
+                    // Find the full issue object from allIssues array based on headline
+                    const fullIssue = allIssues.find(item => item['Headline of the issue'] === topic.headline);
+                    if (fullIssue) {
+                        openTopicModal(fullIssue); // Open modal using the full issue data
+                    }
                 });
                 listItem.appendChild(link);
                 recentList.appendChild(listItem);
@@ -454,25 +529,18 @@
                 link.textContent = item.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
-                    issueElements.forEach(headlineEl => {
-                        if (headlineEl.textContent === item.headline) {
-                            const parentIssueItem = headlineEl.closest('.issue-item');
-                            if (parentIssueItem) {
-                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active');
-                            }
-                        } else {
-                            headlineEl.closest('.issue-item')?.classList.remove('active');
-                        }
-                    });
-                    addTopicToHistory(item.headline);
+                    // Find the full issue object from allIssues array based on headline
+                    const fullIssue = allIssues.find(issue => issue['Headline of the issue'] === item.headline);
+                    if (fullIssue) {
+                        openTopicModal(fullIssue); // Open modal using the full issue data
+                    }
                 });
                 listItem.appendChild(link);
                 historyList.appendChild(listItem);
             });
         }
 
+        // --- Main Data Fetching and Initialization ---
         async function fetchData() {
             try {
                 const response = await fetch(GOOGLE_SHEET_CSV_URL);
@@ -500,6 +568,7 @@
             }
         }
 
+        // --- Event Listeners and Initial Load ---
         const searchBar = document.getElementById('searchBar');
         searchBar.addEventListener('keyup', (e) => {
             const searchTerm = e.target.value.toLowerCase().trim();
@@ -507,9 +576,8 @@
             const filteredIssues = allIssues.filter(issue => {
                 const headline = (issue['Headline of the issue'] || '').toLowerCase();
                 const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
+                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase(); // Include search for link text
                 
-                // Also search in link text if it exists
-                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase();
                 return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm);
             });
             displayIssues(filteredIssues);
@@ -518,6 +586,25 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
             loadHistory();
+        });
+
+        // --- Modal Event Listeners ---
+        const closeButton = document.querySelector('.close-button');
+        closeButton.addEventListener('click', closeTopicModal);
+
+        // Close modal if user clicks outside the modal content
+        window.addEventListener('click', (event) => {
+            const modal = document.getElementById('topicModal');
+            if (event.target === modal) {
+                closeTopicModal();
+            }
+        });
+
+        // Close modal if user presses the Escape key
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeTopicModal();
+            }
         });
     </script>
 </body>
