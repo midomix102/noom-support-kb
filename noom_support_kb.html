@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wikimex Agent Scenarios</title> <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>Wikimex Agent Scenarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4CAF50; /* Noom green */
@@ -157,6 +158,17 @@
         .issue-item.active .issue-description {
             display: block;
         }
+        .issue-description .related-link {
+            display: block; /* Make the link appear on its own line */
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .issue-description .related-link:hover {
+            text-decoration: underline;
+        }
+
 
         .no-results {
             text-align: center;
@@ -249,7 +261,8 @@
         </div>
 
         <div class="main-content">
-            <h1>Wikimex Agent Scenarios</h1> <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
+            <h1>Wikimex Agent Scenarios</h1>
+            <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
             <p class="no-results" style="display: none;">No issues found matching your search.</p>
             <div id="issuesContainer">
                 <p class="loading-message">Loading issues...</p>
@@ -359,7 +372,25 @@
 
                 const description = document.createElement('p');
                 description.classList.add('issue-description');
+                
+                // Add the main description text
                 description.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+
+                // *** NEW: Check for related link URL and text ***
+                const relatedLinkURL = issue['Related Link URL'];
+                const relatedLinkText = issue['Related Link Text'];
+
+                if (relatedLinkURL && relatedLinkURL.trim() !== '') {
+                    const linkElement = document.createElement('a');
+                    linkElement.href = relatedLinkURL.trim();
+                    linkElement.target = "_blank"; // Open in new tab
+                    linkElement.rel = "noopener noreferrer"; // Security best practice
+                    linkElement.classList.add('related-link');
+                    linkElement.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
+                    description.appendChild(linkElement);
+                }
+                // *** END NEW ***
+
                 issueItem.appendChild(description);
 
                 issueItem.addEventListener('click', () => {
@@ -435,7 +466,7 @@
                             headlineEl.closest('.issue-item')?.classList.remove('active');
                         }
                     });
-                    addTopicToHistory(item.headline); // Re-add to history to bring it to the top
+                    addTopicToHistory(item.headline);
                 });
                 listItem.appendChild(link);
                 historyList.appendChild(listItem);
@@ -477,7 +508,9 @@
                 const headline = (issue['Headline of the issue'] || '').toLowerCase();
                 const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
                 
-                return headline.includes(searchTerm) || description.includes(searchTerm);
+                // Also search in link text if it exists
+                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase();
+                return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm);
             });
             displayIssues(filteredIssues);
         });
