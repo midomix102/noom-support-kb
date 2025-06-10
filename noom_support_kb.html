@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #4CAF50; /* Noom green */
-            --secondary-color: #f0f0f0; /* Light background */
+            --primary-color: #4CAF50;
+            --secondary-color: #f4f4f4;
             --text-color: #333;
             --light-text-color: #666;
             --border-color: #e0e0e0;
@@ -20,7 +20,12 @@
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
-            background-color: var(--secondary-color);
+            /* set the background image here */
+            background-image: url('https://drive.google.com/uc?export=view&id=1fy6xleEJBTsaR5p9FVhzF02onol8n7nk');
+            background-size: cover; /* Cover the entire background */
+            background-repeat: no-repeat; /* Prevent image from repeating */
+            background-attachment: fixed; /* Keep background fixed during scrolling */
+            background-position: center center; /* Center the image */
             color: var(--text-color);
             line-height: 1.6;
             display: flex;
@@ -32,10 +37,10 @@
 
         .container {
             display: flex;
-            gap: 20px; /* Space between columns */
+            gap: 20px;
             width: 100%;
-            max-width: 1400px; /* Max width for the entire layout */
-            margin: auto; /* Center the container */
+            max-width: 1400px;
+            margin: auto;
         }
 
         .left-panel, .right-panel {
@@ -43,14 +48,14 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             padding: 20px;
-            overflow-y: auto; /* Enable scrolling for panels */
+            overflow-y: auto;
             min-width: 250px;
             max-width: 300px;
-            flex-shrink: 0; /* Don't allow panels to shrink */
+            flex-shrink: 0;
         }
 
         .main-content {
-            flex-grow: 1; /* Allows main content to take remaining space */
+            flex-grow: 1;
             background-color: var(--panel-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
@@ -66,6 +71,7 @@
             font-size: 2.5em;
             font-weight: 600;
         }
+
         h2 {
             color: var(--text-color);
             font-size: 1.4em;
@@ -73,6 +79,7 @@
             margin-top: 0;
             margin-bottom: 15px;
         }
+
         h3 {
             color: var(--primary-color);
             font-size: 1.2em;
@@ -83,7 +90,7 @@
         }
 
         #searchBar {
-            width: calc(100% - 24px); /* Account for padding */
+            width: calc(100% - 24px);
             padding: 12px;
             margin-bottom: 20px;
             border: 1px solid var(--border-color);
@@ -93,6 +100,7 @@
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
         }
+
         #searchBar:focus {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
@@ -108,79 +116,41 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             cursor: pointer;
-            overflow: hidden; /* To contain floated elements if any */
+            overflow: hidden;
         }
+
         .issue-item:hover {
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             transform: translateY(-3px);
             background-color: #f5f5f5;
         }
-        .issue-item.active {
-            background-color: #e8f5e9; /* Lighter green background when active */
-            border-color: var(--primary-color);
-        }
 
         .issue-headline {
-            font-size: 1.25em;
-            color: var(--text-color);
+            font-size: 20px;
+            color: #333;
             margin: 0;
-            padding-right: 30px; /* Space for expand/collapse indicator */
-            position: relative;
-            font-weight: 600;
-        }
-        .issue-headline::after {
-            content: '+';
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.8em;
-            line-height: 1;
-            transition: transform 0.3s ease, content 0.3s ease;
-            color: var(--primary-color);
-            font-weight: 400;
-        }
-        .issue-item.active .issue-headline::after {
-            content: '-';
-            transform: translateY(-50%) rotate(0deg); /* No rotation needed, just changes to '-' */
         }
 
         .issue-description {
             display: none;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px dashed var(--border-color);
-            color: var(--light-text-color);
-            font-size: 0.95em;
-            line-height: 1.7;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #eee;
+            color: #555;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
         }
+
         .issue-item.active .issue-description {
             display: block;
         }
-        .issue-description .related-link {
-            display: block; /* Make the link appear on its own line */
-            margin-top: 10px;
-            font-weight: 600;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-        .issue-description .related-link:hover {
-            text-decoration: underline;
-        }
-
 
         .no-results {
             text-align: center;
             color: #888;
-            margin-top: 20px;
-            font-size: 1.1em;
-            border: 1px solid #ddd;
-            padding: 15px;
-            background-color: #fff8e1; /* Light yellow for info */
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: none; /* Hidden by default */
+            margin-top: 50px;
+            font-size: 18px;
         }
 
         .panel-list {
@@ -188,66 +158,24 @@
             padding: 0;
             margin: 0;
         }
+
         .panel-list li {
             margin-bottom: 10px;
         }
+
         .panel-list li a {
             display: block;
             padding: 8px 12px;
-            background-color: #f0fdf0; /* Lighter green for list items */
+            background-color: #f0fdf0;
             border-radius: 5px;
             color: var(--primary-color);
             text-decoration: none;
             transition: background-color 0.2s ease, color 0.2s ease;
-            font-size: 0.9em;
-            font-weight: 400;
-            white-space: nowrap; /* Prevent wrapping */
-            overflow: hidden; /* Hide overflow content */
-            text-overflow: ellipsis; /* Add ellipsis for overflow */
         }
+
         .panel-list li a:hover {
             background-color: var(--primary-color);
             color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        .panel-list li a:active {
-            transform: translateY(1px);
-        }
-
-        /* Initial loading message style */
-        .loading-message {
-            text-align: center;
-            color: #777;
-            margin-top: 50px;
-            font-size: 1.1em;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            .container {
-                flex-direction: column; /* Stack columns on smaller screens */
-                padding: 15px;
-            }
-            .left-panel, .right-panel, .main-content {
-                max-width: 100%;
-                min-width: unset;
-                width: 100%;
-                padding: 15px;
-            }
-            .left-panel, .right-panel {
-                order: -1; /* Place panels above main content on small screens */
-            }
-        }
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            h1 {
-                font-size: 2em;
-            }
-            .issue-headline {
-                font-size: 1.15em;
-            }
         }
     </style>
 </head>
@@ -256,35 +184,27 @@
         <div class="left-panel">
             <h3>Accessed Topics (History)</h3>
             <ul id="historyList" class="panel-list">
-                <li class="empty-list-message">No topics accessed yet.</li>
-            </ul>
+                </ul>
         </div>
 
         <div class="main-content">
             <h1>Wikimex Agent Scenarios</h1>
             <input type="text" id="searchBar" placeholder="Search for an issue by headline or description...">
-            <p class="no-results" style="display: none;">No issues found matching your search.</p>
             <div id="issuesContainer">
-                <p class="loading-message">Loading issues...</p>
-            </div>
+                </div>
         </div>
 
         <div class="right-panel">
             <h3>Most Recent Topics</h3>
             <ul id="recentTopicsList" class="panel-list">
-                <li class="empty-list-message">No recent topics available.</li>
-            </ul>
+                </ul>
         </div>
     </div>
 
     <script>
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
-
-        const MAX_HISTORY_ITEMS = 10;
-        const NUM_RECENT_TOPICS = 5; 
+        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?gid=0&single=true&output=csv";
 
         let allIssues = [];
-        let currentHistory = [];
 
         function parseCSV(csvString) {
             const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
@@ -319,84 +239,45 @@
             return data;
         }
 
-        function loadHistory() {
+        async function fetchData() {
             try {
-                const historyJson = localStorage.getItem('noomKbHistory');
-                currentHistory = historyJson ? JSON.parse(historyJson) : [];
-            } catch (e) {
-                console.error("Error loading history from localStorage:", e);
-                currentHistory = [];
+                const response = await fetch(GOOGLE_SHEET_CSV_URL);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const csvText = await response.text();
+                const parsedData = parseCSV(csvText);
+                allIssues = parsedData;
+                displayIssues(allIssues);
+                displayRecentTopics(allIssues.slice(0, 5));
+                displayHistory();
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('issuesContainer').innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. Error: ${error.message}</p>`;
             }
-            displayHistory(currentHistory);
         }
 
-        function saveHistory() {
-            try {
-                localStorage.setItem('noomKbHistory', JSON.stringify(currentHistory));
-            } catch (e) {
-                console.error("Error saving history to localStorage:", e);
-            }
-        }
-
-        function addTopicToHistory(topicHeadline) {
-            currentHistory = currentHistory.filter(item => item.headline !== topicHeadline);
-            currentHistory.unshift({ headline: topicHeadline });
-            
-            if (currentHistory.length > MAX_HISTORY_ITEMS) {
-                currentHistory = currentHistory.slice(0, MAX_HISTORY_ITEMS);
-            }
-            
-            saveHistory();
-            displayHistory(currentHistory);
-        }
-
-        function displayIssues(issuesToDisplay) {
+        function displayIssues(issues) {
             const container = document.getElementById('issuesContainer');
             container.innerHTML = '';
-
-            const noResultsMessage = document.querySelector('.no-results');
-            if (issuesToDisplay.length === 0) {
-                noResultsMessage.style.display = 'block';
-            } else {
-                noResultsMessage.style.display = 'none';
-            }
-
-            issuesToDisplay.forEach(issue => {
+            issues.forEach(issue => {
                 const issueItem = document.createElement('div');
                 issueItem.classList.add('issue-item');
 
                 const headline = document.createElement('h2');
                 headline.classList.add('issue-headline');
-                headline.textContent = issue['Headline of the issue'] || 'No Headline'; 
+                headline.textContent = issue['Headline of the issue'];
                 issueItem.appendChild(headline);
 
                 const description = document.createElement('p');
                 description.classList.add('issue-description');
-                
-                // Add the main description text
-                description.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
-
-                // *** NEW: Check for related link URL and text ***
-                const relatedLinkURL = issue['Related Link URL'];
-                const relatedLinkText = issue['Related Link Text'];
-
-                if (relatedLinkURL && relatedLinkURL.trim() !== '') {
-                    const linkElement = document.createElement('a');
-                    linkElement.href = relatedLinkURL.trim();
-                    linkElement.target = "_blank"; // Open in new tab
-                    linkElement.rel = "noopener noreferrer"; // Security best practice
-                    linkElement.classList.add('related-link');
-                    linkElement.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
-                    description.appendChild(linkElement);
-                }
-                // *** END NEW ***
-
+                description.innerHTML = issue['description of the issue and how it solved perfectly'];
                 issueItem.appendChild(description);
 
                 issueItem.addEventListener('click', () => {
                     issueItem.classList.toggle('active');
                     if (issueItem.classList.contains('active')) {
-                        addTopicToHistory(issue['Headline of the issue']);
+                        addToHistory(issue['Headline of the issue']);
                     }
                 });
                 container.appendChild(issueItem);
@@ -406,119 +287,47 @@
         function displayRecentTopics(recentTopics) {
             const recentList = document.getElementById('recentTopicsList');
             recentList.innerHTML = '';
-
-            if (recentTopics.length === 0) {
-                recentList.innerHTML = '<li class="empty-list-message">No recent topics available.</li>';
-                return;
-            }
-
             recentTopics.forEach(topic => {
                 const listItem = document.createElement('li');
                 const link = document.createElement('a');
                 link.href = "#";
-                link.textContent = topic.headline;
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
-                    issueElements.forEach(headlineEl => {
-                        if (headlineEl.textContent === topic.headline) {
-                            const parentIssueItem = headlineEl.closest('.issue-item');
-                            if (parentIssueItem) {
-                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active');
-                                addTopicToHistory(topic.headline);
-                            }
-                        } else {
-                            headlineEl.closest('.issue-item')?.classList.remove('active');
-                        }
-                    });
-                });
+                link.textContent = topic['Headline of the issue'];
                 listItem.appendChild(link);
                 recentList.appendChild(listItem);
             });
         }
 
-        function displayHistory(history) {
+          function displayHistory() {
             const historyList = document.getElementById('historyList');
             historyList.innerHTML = '';
-
-            if (history.length === 0) {
-                historyList.innerHTML = '<li class="empty-list-message">No topics accessed yet.</li>';
-                return;
-            }
-
-            history.forEach(item => {
-                const listItem = document.createElement('li');
-                const link = document.createElement('a');
-                link.href = "#";
-                link.textContent = item.headline;
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const issueElements = document.querySelectorAll('.issue-item .issue-headline');
-                    issueElements.forEach(headlineEl => {
-                        if (headlineEl.textContent === item.headline) {
-                            const parentIssueItem = headlineEl.closest('.issue-item');
-                            if (parentIssueItem) {
-                                parentIssueItem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                parentIssueItem.classList.add('active');
-                            }
-                        } else {
-                            headlineEl.closest('.issue-item')?.classList.remove('active');
-                        }
-                    });
-                    addTopicToHistory(item.headline);
+            const history = localStorage.getItem('history');
+            if (history) {
+                const historyItems = JSON.parse(history);
+                historyItems.forEach(item => {
+                    const listItem = document.createElement('li');
+                    const link = document.createElement('a');
+                    link.href = "#";
+                    link.textContent = item;
+                    listItem.appendChild(link);
+                    historyList.appendChild(listItem);
                 });
-                listItem.appendChild(link);
-                historyList.appendChild(listItem);
-            });
-        }
-
-        async function fetchData() {
-            try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const csvText = await response.text();
-                const parsedData = parseCSV(csvText);
-                allIssues = parsedData; 
-                
-                console.log("Fetched and parsed issues:", allIssues); 
-
-                displayIssues(allIssues);
-
-                const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
-                    headline: issue['Headline of the issue']
-                }));
-                displayRecentTopics(recentTopics);
-
-            } catch (error) {
-                console.error("Error fetching or parsing data:", error);
-                const container = document.getElementById('issuesContainer');
-                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
-                document.querySelector('.no-results').style.display = 'none';
             }
         }
 
-        const searchBar = document.getElementById('searchBar');
-        searchBar.addEventListener('keyup', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            const filteredIssues = allIssues.filter(issue => {
-                const headline = (issue['Headline of the issue'] || '').toLowerCase();
-                const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
-                
-                // Also search in link text if it exists
-                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase();
-                return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm);
-            });
-            displayIssues(filteredIssues);
-        });
+        function addToHistory(headline) {
+            let history = localStorage.getItem('history');
+            let historyItems = history ? JSON.parse(history) : [];
+            if (!historyItems.includes(headline)) {
+                historyItems.push(headline);
+                if (historyItems.length > 5) {
+                    historyItems.shift();
+                }
+                localStorage.setItem('history', JSON.stringify(historyItems));
+                displayHistory();
+            }
+        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchData();
-            loadHistory();
-        });
+        document.addEventListener('DOMContentLoaded', fetchData);
     </script>
 </body>
 </html>
