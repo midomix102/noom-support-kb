@@ -20,8 +20,7 @@
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
-            /* >>> YOUR NEW BACKGROUND IMAGE URL IS HERE <<< */
-            background-image: url('https://i.postimg.cc/SxzGKmFS/New-Project.jpg');
+            background-image: url('https://i.imgur.com/IoXdJJR.jpeg');
             background-size: cover; /* Cover the entire background */
             background-repeat: no-repeat; /* Prevent image from repeating */
             background-attachment: fixed; /* Keep the background fixed during scrolling */
@@ -653,9 +652,11 @@
                 const description = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
                 const systemAction = issue.fields.systemAction ? convertRichTextToHtml(issue.fields.systemAction, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
                 const customerResponse = issue.fields.customerResponse ? convertRichTextToHtml(issue.fields.customerResponse, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
-                const keywords = (issue.fields.keywords || '').toLowerCase();
                 
-                return scenarioTitle.includes(searchTerm) || description.includes(searchTerm) || systemAction.includes(searchTerm) || customerResponse.includes(searchTerm) || keywords.includes(searchTerm);
+                const keywords = issue.fields.keywords || [];
+                const keywordSearch = keywords.some(keyword => keyword.toLowerCase().includes(searchTerm));
+                
+                return scenarioTitle.includes(searchTerm) || description.includes(searchTerm) || systemAction.includes(searchTerm) || customerResponse.includes(searchTerm) || keywordSearch;
             });
             displayIssues(filteredIssues, {});
         });
