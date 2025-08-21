@@ -20,7 +20,6 @@
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
-            /* >>> PASTE YOUR DIRECT IMAGE URL HERE <<< */
             background-image: url('https://i.imgur.com/IoXdJJR.jpeg');
             background-size: cover; /* Cover the entire background */
             background-repeat: no-repeat; /* Prevent image from repeating */
@@ -184,7 +183,7 @@
 
         /* --- Modal Styles --- */
         .modal {
-            display: none; /* Correctly hidden by default */
+            display: none;
             position: fixed;
             z-index: 1000;
             left: 0;
@@ -211,6 +210,7 @@
             overflow-y: auto;
             animation: slideIn 0.3s ease-out;
         }
+
         .modal-content h2 {
             font-size: 2em;
             color: var(--primary-color);
@@ -218,13 +218,12 @@
             margin-bottom: 15px;
             padding-right: 40px;
         }
-
-        .modal-content p {
+        
+        .modal-content .modal-description-text {
             color: var(--light-text-color);
             font-size: 1em;
             line-height: 1.7;
             margin-bottom: 15px;
-            white-space: pre-wrap;
         }
 
         .modal-content .related-link {
@@ -353,7 +352,9 @@
     </div>
 
     <script>
-        const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSNpMMdiFqgBuFekTekMRqQYycJ-cj4awk2F9hFs3CutrGrcf6qwXXQZDn68_0rC2he8sjmEG9z0rqS/pub?output=csv"; 
+        const CONTENTFUL_SPACE_ID = '653sukpq8rk2';
+        const CONTENTFUL_ACCESS_TOKEN = 'IhrkR40D-edohj9NhB3RIocfiyHYiIVDbueLWahmKb8';
+        const CONTENTFUL_API_URL = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=scenario`;
 
         const MAX_HISTORY_ITEMS = 10;
         const NUM_RECENT_TOPICS = 5; 
@@ -361,37 +362,52 @@
         let allIssues = [];
         let currentHistory = [];
 
-        function parseCSV(csvString) {
-            const lines = csvString.split(/\r?\n/).filter(line => line.trim() !== '');
-            if (lines.length === 0) return [];
+        // Helper function to convert Contentful's rich text JSON to HTML
+        function convertRichTextToHtml(richTextJson, assets) {
+            const document = richTextJson.content;
+            let htmlString = "";
 
-            const headers = lines[0].split(',').map(h => h.trim());
-            const data = [];
-
-            for (let i = 1; i < lines.length; i++) {
-                const values = [];
-                let inQuote = false;
-                let start = 0;
-
-                for (let j = 0; j < lines[i].length; j++) {
-                    if (lines[i][j] === '"') {
-                        inQuote = !inQuote;
-                    } else if (lines[i][j] === ',' && !inQuote) {
-                        values.push(lines[i].substring(start, j).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
-                        start = j + 1;
+            const processNode = (node) => {
+                if (node.nodeType === 'text') {
+                    let text = node.value;
+                    if (node.marks) {
+                        node.marks.forEach(mark => {
+                            if (mark.type === 'bold') text = `<b>${text}</b>`;
+                            if (mark.type === 'italic') text = `<i>${text}</i>`;
+                            if (mark.type === 'underline') text = `<u>${text}</u>`;
+                        });
+                    }
+                    htmlString += text;
+                } else if (node.nodeType === 'paragraph') {
+                    htmlString += '<p>';
+                    node.content.forEach(processNode);
+                    htmlString += '</p>';
+                } else if (node.nodeType === 'hyperlink') {
+                    const uri = node.data.uri;
+                    htmlString += `<a href="${uri}" target="_blank" rel="noopener noreferrer">`;
+                    node.content.forEach(processNode);
+                    htmlString += '</a>';
+                } else if (node.nodeType === 'unordered-list') {
+                    htmlString += '<ul>';
+                    node.content.forEach(processNode);
+                    htmlString += '</ul>';
+                } else if (node.nodeType === 'list-item') {
+                    htmlString += '<li>';
+                    node.content.forEach(processNode);
+                    htmlString += '</li>';
+                } else if (node.nodeType === 'embedded-asset-block') {
+                    const assetId = node.data.target.sys.id;
+                    const asset = assets[assetId];
+                    if (asset && asset.fields && asset.fields.file) {
+                        const imageUrl = asset.fields.file.url;
+                        const imageTitle = asset.fields.title || '';
+                        htmlString += `<p><img src="${imageUrl}" alt="${imageTitle}" style="max-width:100%; height:auto;"></p>`;
                     }
                 }
-                values.push(lines[i].substring(start).replace(/^"|"$/g, '').replace(/""/g, '"').trim());
+            };
 
-                if (values.length === headers.length) {
-                    const row = {};
-                    headers.forEach((header, index) => {
-                        row[header] = values[index];
-                    });
-                    data.push(row);
-                }
-            }
-            return data;
+            document.forEach(processNode);
+            return htmlString;
         }
 
         function loadHistory() {
@@ -425,18 +441,26 @@
             displayHistory(currentHistory);
         }
 
-        function openTopicModal(issue) {
+        function openTopicModal(issue, assets) {
             const modal = document.getElementById('topicModal');
             const modalHeadline = document.getElementById('modalHeadline');
             const modalDescriptionDiv = document.getElementById('modalDescription');
             const modalLink = document.getElementById('modalLink');
             const modalImage = document.getElementById('modalImage');
 
-            modalHeadline.textContent = issue['Headline of the issue'] || 'No Headline';
-            modalDescriptionDiv.innerHTML = (issue['description of the issue and how it solved perfectly'] || 'No description.').replace(/\\n/g, '<br>').replace(/\n/g, '<br>');
+            const fields = issue.fields;
 
-            const relatedLinkURL = issue['Related Link URL'];
-            const relatedLinkText = issue['Related Link Text'];
+            modalHeadline.textContent = fields.headline || 'No Headline';
+            
+            // Use the rich text converter for the description
+            if (fields.description) {
+                modalDescriptionDiv.innerHTML = convertRichTextToHtml(fields.description, assets);
+            } else {
+                modalDescriptionDiv.innerHTML = 'No description.';
+            }
+
+            const relatedLinkURL = fields.relatedLinkUrl;
+            const relatedLinkText = fields.relatedLinkText;
             if (relatedLinkURL && relatedLinkURL.trim() !== '') {
                 modalLink.href = relatedLinkURL.trim();
                 modalLink.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
@@ -445,25 +469,18 @@
                 modalLink.style.display = 'none';
             }
 
-            const imageURL = issue['Image URL'];
-            if (imageURL && imageURL.trim() !== '') {
-                modalImage.src = imageURL.trim();
-                modalImage.alt = issue['Headline of the issue'] + ' image' || 'Related image';
-                modalImage.style.display = 'block';
-            } else {
-                modalImage.style.display = 'none';
-                modalImage.src = '';
-            }
+            // Handle the image from the rich text renderer; no need for the separate img tag
+            modalImage.style.display = 'none'; 
 
             modal.style.display = 'flex';
-            addTopicToHistory(issue['Headline of the issue']);
+            addTopicToHistory(fields.headline);
         }
 
         function closeTopicModal() {
             document.getElementById('topicModal').style.display = 'none';
         }
 
-        function displayIssues(issuesToDisplay) {
+        function displayIssues(issuesToDisplay, assets) {
             const container = document.getElementById('issuesContainer');
             container.innerHTML = '';
 
@@ -480,17 +497,17 @@
 
                 const headline = document.createElement('h2');
                 headline.classList.add('issue-headline');
-                headline.textContent = issue['Headline of the issue'] || 'No Headline'; 
+                headline.textContent = issue.fields.headline || 'No Headline'; 
                 issueItem.appendChild(headline);
 
                 issueItem.addEventListener('click', () => {
-                    openTopicModal(issue);
+                    openTopicModal(issue, assets);
                 });
                 container.appendChild(issueItem);
             });
         }
 
-        function displayRecentTopics(recentTopics) {
+        function displayRecentTopics(recentTopics, assets) {
             const recentList = document.getElementById('recentTopicsList');
             recentList.innerHTML = '';
 
@@ -506,9 +523,9 @@
                 link.textContent = topic.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const fullIssue = allIssues.find(item => item['Headline of the issue'] === topic.headline);
+                    const fullIssue = allIssues.find(item => item.fields.headline === topic.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue);
+                        openTopicModal(fullIssue, assets);
                     }
                 });
                 listItem.appendChild(link);
@@ -532,9 +549,9 @@
                 link.textContent = item.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const fullIssue = allIssues.find(issue => issue['Headline of the issue'] === item.headline);
+                    const fullIssue = allIssues.find(issue => issue.fields.headline === item.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue);
+                        openTopicModal(fullIssue, assets);
                     }
                 });
                 listItem.appendChild(link);
@@ -544,27 +561,36 @@
 
         async function fetchData() {
             try {
-                const response = await fetch(GOOGLE_SHEET_CSV_URL); 
+                const response = await fetch(CONTENTFUL_API_URL);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const csvText = await response.text();
-                const parsedData = parseCSV(csvText); 
-                allIssues = parsedData; 
+                const jsonData = await response.json(); 
                 
-                console.log("Fetched and parsed issues (from CSV):", allIssues); 
+                // Contentful returns entries and assets separately, we need to process them
+                const assets = {};
+                if(jsonData.includes && jsonData.includes.Asset) {
+                    jsonData.includes.Asset.forEach(asset => {
+                        assets[asset.sys.id] = asset;
+                    });
+                }
 
-                displayIssues(allIssues);
+                allIssues = jsonData.items;
+                
+                console.log("Fetched and parsed issues (from Contentful):", allIssues); 
+                console.log("Fetched and parsed assets (from Contentful):", assets);
+
+                displayIssues(allIssues, assets);
 
                 const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
-                    headline: issue['Headline of the issue']
+                    headline: issue.fields.headline
                 }));
-                displayRecentTopics(recentTopics);
+                displayRecentTopics(recentTopics, assets);
 
             } catch (error) {
                 console.error("Error fetching or parsing data:", error);
                 const container = document.getElementById('issuesContainer');
-                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check the Google Sheet URL and ensure it's published correctly. <br>Error: ${error.message}</p>`;
+                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check your Contentful API credentials and ensure the 'scenario' content type exists. <br>Error: ${error.message}</p>`;
                 document.querySelector('.no-results').style.display = 'none';
             }
         }
@@ -574,13 +600,13 @@
             const searchTerm = e.target.value.toLowerCase().trim();
             
             const filteredIssues = allIssues.filter(issue => {
-                const headline = (issue['Headline of the issue'] || '').toLowerCase();
-                const description = (issue['description of the issue and how it solved perfectly'] || '').toLowerCase();
-                const relatedLinkText = (issue['Related Link Text'] || '').toLowerCase();
+                const headline = (issue.fields.headline || '').toLowerCase();
+                // To search in rich text, we need to convert it to plain text first
+                const richTextPlain = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
                 
-                return headline.includes(searchTerm) || description.includes(searchTerm) || relatedLinkText.includes(searchTerm);
+                return headline.includes(searchTerm) || richTextPlain.includes(searchTerm);
             });
-            displayIssues(filteredIssues);
+            displayIssues(filteredIssues, {}); // Assets are not needed for search
         });
 
         document.addEventListener('DOMContentLoaded', () => {
