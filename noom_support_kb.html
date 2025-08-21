@@ -20,7 +20,8 @@
         body {
             font-family: 'Poppins', Arial, sans-serif;
             margin: 0;
-            background-image: url('https://i.imgur.com/IoXdJJR.jpeg');
+            /* >>> YOUR NEW BACKGROUND IMAGE URL IS HERE <<< */
+            background-image: url('https://i.postimg.cc/vBFC3PMy/JT-Express-Logo.jpg');
             background-size: cover; /* Cover the entire background */
             background-repeat: no-repeat; /* Prevent image from repeating */
             background-attachment: fixed; /* Keep the background fixed during scrolling */
@@ -267,6 +268,24 @@
             text-decoration: none;
             outline: none;
         }
+        
+        .clear-history-button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: #e57373;
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-align: center;
+        }
+        .clear-history-button:hover {
+            background-color: #d32f2f;
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; }
@@ -322,6 +341,7 @@
             <ul id="historyList" class="panel-list">
                 <li class="empty-list-message">No topics accessed yet.</li>
             </ul>
+            <button id="clearHistoryBtn" class="clear-history-button">Clear History</button>
         </div>
 
         <div class="main-content">
@@ -576,6 +596,18 @@
                 historyList.appendChild(listItem);
             });
         }
+        
+        function clearHistory() {
+            const password = prompt("Please enter the password to clear history:");
+            if (password === '2221994') {
+                localStorage.removeItem('wikimexKbHistory');
+                currentHistory = [];
+                displayHistory(currentHistory);
+                alert('History has been cleared!');
+            } else {
+                alert('Incorrect password. History was not cleared.');
+            }
+        }
 
         async function fetchData() {
             try {
@@ -587,7 +619,7 @@
                 
                 const assets = {};
                 if(jsonData.includes && jsonData.includes.Asset) {
-                    jsonData.includes.Asset.forEach(asset => {
+                    jsonData.includes.includes.Asset.forEach(asset => {
                         assets[asset.sys.id] = asset;
                     });
                 }
@@ -631,6 +663,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             fetchData();
             loadHistory();
+            document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
         });
 
         const closeButton = document.querySelector('.close-button');
