@@ -354,7 +354,7 @@
     <script>
         const CONTENTFUL_SPACE_ID = '653sukpq8rk2';
         const CONTENTFUL_ACCESS_TOKEN = 'IhrkR40D-edohj9NhB3RIocfiyHYiIVDbueLWahmKb8';
-        const CONTENTFUL_API_URL = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=customerSupportScenario`;
+        const CONTENTFUL_API_URL = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=customerSupportScenario&include=1`;
 
         const MAX_HISTORY_ITEMS = 10;
         const NUM_RECENT_TOPICS = 5; 
@@ -364,7 +364,8 @@
 
         // Helper function to convert Contentful's rich text JSON to HTML
         function convertRichTextToHtml(richTextJson, assets) {
-            const document = richTextJson.content;
+            if (!richTextJson) return '';
+            
             let htmlString = "";
 
             const processNode = (node) => {
@@ -399,14 +400,19 @@
                     const assetId = node.data.target.sys.id;
                     const asset = assets[assetId];
                     if (asset && asset.fields && asset.fields.file) {
-                        const imageUrl = asset.fields.file.url;
+                        const imageUrl = 'https:' + asset.fields.file.url; // Corrected: Add https:
                         const imageTitle = asset.fields.title || '';
                         htmlString += `<p><img src="${imageUrl}" alt="${imageTitle}" style="max-width:100%; height:auto;"></p>`;
                     }
+                } else if (node.nodeType === 'hr') {
+                    htmlString += '<hr>';
+                } else if (node.content) { // Fallback for other node types
+                    node.content.forEach(processNode);
                 }
             };
-
-            document.forEach(processNode);
+            if (richTextJson.content) {
+                richTextJson.content.forEach(processNode);
+            }
             return htmlString;
         }
 
