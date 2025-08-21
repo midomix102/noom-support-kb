@@ -345,9 +345,12 @@
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2 id="modalHeadline"></h2>
-            <div id="modalDescription" class="modal-description-text"></div>
-            <a id="modalLink" class="related-link" target="_blank" rel="noopener noreferrer" style="display: none;"></a>
-            <img id="modalImage" style="display: none; max-width: 100%; height: auto; margin-top: 20px;" alt="Related image">
+            <div class="modal-body-content">
+                <div id="modalDescription"></div>
+                <div id="modalCustomerResponse"></div>
+                <div id="modalSystemAction"></div>
+                <div id="modalKeywords"></div>
+            </div>
         </div>
     </div>
 
@@ -362,9 +365,8 @@
         let allIssues = [];
         let currentHistory = [];
 
-        // Helper function to convert Contentful's rich text JSON to HTML
         function convertRichTextToHtml(richTextJson, assets) {
-            if (!richTextJson) return '';
+            if (!richTextJson || !richTextJson.content) return '';
             
             let htmlString = "";
 
@@ -400,16 +402,17 @@
                     const assetId = node.data.target.sys.id;
                     const asset = assets[assetId];
                     if (asset && asset.fields && asset.fields.file) {
-                        const imageUrl = 'https:' + asset.fields.file.url; // Corrected: Add https:
+                        const imageUrl = 'https:' + asset.fields.file.url;
                         const imageTitle = asset.fields.title || '';
                         htmlString += `<p><img src="${imageUrl}" alt="${imageTitle}" style="max-width:100%; height:auto;"></p>`;
                     }
                 } else if (node.nodeType === 'hr') {
                     htmlString += '<hr>';
-                } else if (node.content) { // Fallback for other node types
+                } else if (node.content) {
                     node.content.forEach(processNode);
                 }
             };
+
             if (richTextJson.content) {
                 richTextJson.content.forEach(processNode);
             }
@@ -451,33 +454,44 @@
             const modal = document.getElementById('topicModal');
             const modalHeadline = document.getElementById('modalHeadline');
             const modalDescriptionDiv = document.getElementById('modalDescription');
-            const modalLink = document.getElementById('modalLink');
-            const modalImage = document.getElementById('modalImage');
+            const modalCustomerResponseDiv = document.getElementById('modalCustomerResponse');
+            const modalSystemActionDiv = document.getElementById('modalSystemAction');
+            const modalKeywordsDiv = document.getElementById('modalKeywords');
 
             const fields = issue.fields;
 
-            modalHeadline.textContent = fields.headline || 'No Headline';
+            modalHeadline.textContent = fields.scenarioTitle || 'No Headline';
             
             if (fields.description) {
-                modalDescriptionDiv.innerHTML = convertRichTextToHtml(fields.description, assets);
+                modalDescriptionDiv.innerHTML = `<h3>Description</h3>` + convertRichTextToHtml(fields.description, assets);
             } else {
-                modalDescriptionDiv.innerHTML = 'No description.';
+                modalDescriptionDiv.innerHTML = `<h3>Description</h3><p>No description.</p>`;
             }
 
-            const relatedLinkURL = fields.relatedLinkUrl;
-            const relatedLinkText = fields.relatedLinkText;
-            if (relatedLinkURL && relatedLinkURL.trim() !== '') {
-                modalLink.href = relatedLinkURL.trim();
-                modalLink.textContent = relatedLinkText && relatedLinkText.trim() !== '' ? relatedLinkText.trim() : 'View Related Link';
-                modalLink.style.display = 'block';
+            if (fields.customerResponse) {
+                modalCustomerResponseDiv.innerHTML = `<h3>Customer Response</h3>` + convertRichTextToHtml(fields.customerResponse, assets);
+                modalCustomerResponseDiv.style.display = 'block';
             } else {
-                modalLink.style.display = 'none';
+                modalCustomerResponseDiv.style.display = 'none';
             }
 
-            modalImage.style.display = 'none'; 
+            if (fields.systemAction) {
+                modalSystemActionDiv.innerHTML = `<h3>System Action</h3>` + convertRichTextToHtml(fields.systemAction, assets);
+                modalSystemActionDiv.style.display = 'block';
+            } else {
+                modalSystemActionDiv.style.display = 'none';
+            }
+
+            if (fields.keywords) {
+                modalKeywordsDiv.innerHTML = `<h3>Keywords</h3>` + `<p>${fields.keywords}</p>`;
+                modalKeywordsDiv.style.display = 'block';
+            } else {
+                modalKeywordsDiv.style.display = 'none';
+            }
+
 
             modal.style.display = 'flex';
-            addTopicToHistory(fields.headline);
+            addTopicToHistory(fields.scenarioTitle);
         }
 
         function closeTopicModal() {
@@ -501,7 +515,7 @@
 
                 const headline = document.createElement('h2');
                 headline.classList.add('issue-headline');
-                headline.textContent = issue.fields.headline || 'No Headline'; 
+                headline.textContent = issue.fields.scenarioTitle || 'No Headline'; 
                 issueItem.appendChild(headline);
 
                 issueItem.addEventListener('click', () => {
@@ -527,7 +541,7 @@
                 link.textContent = topic.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const fullIssue = allIssues.find(item => item.fields.headline === topic.headline);
+                    const fullIssue = allIssues.find(item => item.fields.scenarioTitle === topic.headline);
                     if (fullIssue) {
                         openTopicModal(fullIssue, assets);
                     }
@@ -553,7 +567,7 @@
                 link.textContent = item.headline;
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    const fullIssue = allIssues.find(issue => issue.fields.headline === item.headline);
+                    const fullIssue = allIssues.find(issue => issue.fields.scenarioTitle === item.headline);
                     if (fullIssue) {
                         openTopicModal(fullIssue, assets);
                     }
@@ -586,7 +600,7 @@
                 displayIssues(allIssues, assets);
 
                 const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
-                    headline: issue.fields.headline
+                    headline: issue.fields.scenarioTitle
                 }));
                 displayRecentTopics(recentTopics, assets);
 
@@ -603,10 +617,13 @@
             const searchTerm = e.target.value.toLowerCase().trim();
             
             const filteredIssues = allIssues.filter(issue => {
-                const headline = (issue.fields.headline || '').toLowerCase();
-                const richTextPlain = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const scenarioTitle = (issue.fields.scenarioTitle || '').toLowerCase();
+                const description = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const systemAction = issue.fields.systemAction ? convertRichTextToHtml(issue.fields.systemAction, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const customerResponse = issue.fields.customerResponse ? convertRichTextToHtml(issue.fields.customerResponse, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const keywords = (issue.fields.keywords || '').toLowerCase();
                 
-                return headline.includes(searchTerm) || richTextPlain.includes(searchTerm);
+                return scenarioTitle.includes(searchTerm) || description.includes(searchTerm) || systemAction.includes(searchTerm) || customerResponse.includes(searchTerm) || keywords.includes(searchTerm);
             });
             displayIssues(filteredIssues, {});
         });
