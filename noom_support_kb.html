@@ -354,7 +354,7 @@
     <script>
         const CONTENTFUL_SPACE_ID = '653sukpq8rk2';
         const CONTENTFUL_ACCESS_TOKEN = 'IhrkR40D-edohj9NhB3RIocfiyHYiIVDbueLWahmKb8';
-        const CONTENTFUL_API_URL = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=scenario`;
+        const CONTENTFUL_API_URL = `https://cdn.contentful.com/spaces/${CONTENTFUL_SPACE_ID}/environments/master/entries?access_token=${CONTENTFUL_ACCESS_TOKEN}&content_type=customerSupportScenario`;
 
         const MAX_HISTORY_ITEMS = 10;
         const NUM_RECENT_TOPICS = 5; 
@@ -452,7 +452,6 @@
 
             modalHeadline.textContent = fields.headline || 'No Headline';
             
-            // Use the rich text converter for the description
             if (fields.description) {
                 modalDescriptionDiv.innerHTML = convertRichTextToHtml(fields.description, assets);
             } else {
@@ -469,7 +468,6 @@
                 modalLink.style.display = 'none';
             }
 
-            // Handle the image from the rich text renderer; no need for the separate img tag
             modalImage.style.display = 'none'; 
 
             modal.style.display = 'flex';
@@ -567,7 +565,6 @@
                 }
                 const jsonData = await response.json(); 
                 
-                // Contentful returns entries and assets separately, we need to process them
                 const assets = {};
                 if(jsonData.includes && jsonData.includes.Asset) {
                     jsonData.includes.Asset.forEach(asset => {
@@ -590,7 +587,7 @@
             } catch (error) {
                 console.error("Error fetching or parsing data:", error);
                 const container = document.getElementById('issuesContainer');
-                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check your Contentful API credentials and ensure the 'scenario' content type exists. <br>Error: ${error.message}</p>`;
+                container.innerHTML = `<p style="color: red; text-align: center;">Failed to load issues. Please check your Contentful API credentials and ensure the 'customerSupportScenario' content type exists. <br>Error: ${error.message}</p>`;
                 document.querySelector('.no-results').style.display = 'none';
             }
         }
@@ -601,12 +598,11 @@
             
             const filteredIssues = allIssues.filter(issue => {
                 const headline = (issue.fields.headline || '').toLowerCase();
-                // To search in rich text, we need to convert it to plain text first
                 const richTextPlain = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
                 
                 return headline.includes(searchTerm) || richTextPlain.includes(searchTerm);
             });
-            displayIssues(filteredIssues, {}); // Assets are not needed for search
+            displayIssues(filteredIssues, {});
         });
 
         document.addEventListener('DOMContentLoaded', () => {
