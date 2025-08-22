@@ -381,7 +381,8 @@
         const MAX_HISTORY_ITEMS = 10;
         const NUM_RECENT_TOPICS = 5; 
 
-        let allIssues = [];
+        let allIssues = {};
+        let allAssets = {};
         let currentHistory = [];
 
         function convertRichTextToHtml(richTextJson, assets) {
@@ -469,7 +470,7 @@
             displayHistory(currentHistory);
         }
 
-        function openTopicModal(issue, assets) {
+        function openTopicModal(issue) {
             const modal = document.getElementById('topicModal');
             const modalHeadline = document.getElementById('modalHeadline');
             const modalDescriptionDiv = document.getElementById('modalDescription');
@@ -482,20 +483,20 @@
             modalHeadline.textContent = fields.scenarioTitle || 'No Headline';
             
             if (fields.description) {
-                modalDescriptionDiv.innerHTML = `<h3>Description</h3>` + convertRichTextToHtml(fields.description, assets);
+                modalDescriptionDiv.innerHTML = `<h3>Description</h3>` + convertRichTextToHtml(fields.description, allAssets);
             } else {
                 modalDescriptionDiv.innerHTML = `<h3>Description</h3><p>No description.</p>`;
             }
 
             if (fields.customerResponse) {
-                modalCustomerResponseDiv.innerHTML = `<h3>Customer Response</h3>` + convertRichTextToHtml(fields.customerResponse, assets);
+                modalCustomerResponseDiv.innerHTML = `<h3>Customer Response</h3>` + convertRichTextToHtml(fields.customerResponse, allAssets);
                 modalCustomerResponseDiv.style.display = 'block';
             } else {
                 modalCustomerResponseDiv.style.display = 'none';
             }
 
             if (fields.systemAction) {
-                modalSystemActionDiv.innerHTML = `<h3>System Action</h3>` + convertRichTextToHtml(fields.systemAction, assets);
+                modalSystemActionDiv.innerHTML = `<h3>System Action</h3>` + convertRichTextToHtml(fields.systemAction, allAssets);
                 modalSystemActionDiv.style.display = 'block';
             } else {
                 modalSystemActionDiv.style.display = 'none';
@@ -508,7 +509,6 @@
                 modalKeywordsDiv.style.display = 'none';
             }
 
-
             modal.style.display = 'flex';
             addTopicToHistory(fields.scenarioTitle);
         }
@@ -517,7 +517,7 @@
             document.getElementById('topicModal').style.display = 'none';
         }
 
-        function displayIssues(issuesToDisplay, assets) {
+        function displayIssues(issuesToDisplay) {
             const container = document.getElementById('issuesContainer');
             container.innerHTML = '';
 
@@ -538,13 +538,13 @@
                 issueItem.appendChild(headline);
 
                 issueItem.addEventListener('click', () => {
-                    openTopicModal(issue, assets);
+                    openTopicModal(issue, allAssets);
                 });
                 container.appendChild(issueItem);
             });
         }
 
-        function displayRecentTopics(recentTopics, assets) {
+        function displayRecentTopics(recentTopics) {
             const recentList = document.getElementById('recentTopicsList');
             recentList.innerHTML = '';
 
@@ -562,7 +562,7 @@
                     e.preventDefault();
                     const fullIssue = allIssues.find(item => item.fields.scenarioTitle === topic.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue, assets);
+                        openTopicModal(fullIssue, allAssets);
                     }
                 });
                 listItem.appendChild(link);
@@ -588,7 +588,7 @@
                     e.preventDefault();
                     const fullIssue = allIssues.find(issue => issue.fields.scenarioTitle === item.headline);
                     if (fullIssue) {
-                        openTopicModal(fullIssue, assets);
+                        openTopicModal(fullIssue, allAssets);
                     }
                 });
                 listItem.appendChild(link);
@@ -624,16 +624,17 @@
                 }
 
                 allIssues = jsonData.items;
+                allAssets = assets; // Store assets globally
                 
                 console.log("Fetched and parsed issues (from Contentful):", allIssues); 
-                console.log("Fetched and parsed assets (from Contentful):", assets);
+                console.log("Fetched and parsed assets (from Contentful):", allAssets);
 
-                displayIssues(allIssues, assets);
+                displayIssues(allIssues);
 
                 const recentTopics = allIssues.slice(0, NUM_RECENT_TOPICS).map(issue => ({
                     headline: issue.fields.scenarioTitle
                 }));
-                displayRecentTopics(recentTopics, assets);
+                displayRecentTopics(recentTopics);
 
             } catch (error) {
                 console.error("Error fetching or parsing data:", error);
@@ -649,16 +650,16 @@
             
             const filteredIssues = allIssues.filter(issue => {
                 const scenarioTitle = (issue.fields.scenarioTitle || '').toLowerCase();
-                const description = issue.fields.description ? convertRichTextToHtml(issue.fields.description, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
-                const systemAction = issue.fields.systemAction ? convertRichTextToHtml(issue.fields.systemAction, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
-                const customerResponse = issue.fields.customerResponse ? convertRichTextToHtml(issue.fields.customerResponse, {}).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const description = issue.fields.description ? convertRichTextToHtml(issue.fields.description, allAssets).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const systemAction = issue.fields.systemAction ? convertRichTextToHtml(issue.fields.systemAction, allAssets).toLowerCase().replace(/<[^>]+>/g, '') : '';
+                const customerResponse = issue.fields.customerResponse ? convertRichTextToHtml(issue.fields.customerResponse, allAssets).toLowerCase().replace(/<[^>]+>/g, '') : '';
                 
                 const keywords = issue.fields.keywords || [];
                 const keywordSearch = keywords.some(keyword => keyword.toLowerCase().includes(searchTerm));
                 
                 return scenarioTitle.includes(searchTerm) || description.includes(searchTerm) || systemAction.includes(searchTerm) || customerResponse.includes(searchTerm) || keywordSearch;
             });
-            displayIssues(filteredIssues, {});
+            displayIssues(filteredIssues);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
